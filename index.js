@@ -3,7 +3,7 @@ var jpeg = require('jpeg-marker-stream')
 var sub = require('subleveldown')
 var to = require('to2')
 var through = require('through2')
-var readonly = require('read-only-stream')
+var duplexify = require('duplexify')
 
 var DEX = 'd', META = 'm', PROPS = 'p!'
 
@@ -49,18 +49,28 @@ function JDEX (opts) {
 }
 
 JDEX.prototype.list = function (cb) {
-  var r = this.metadb.createReadStream({ gt: PROPS, lt: PROPS + '~' })
-  var stream = r.pipe(through.obj(function (row, enc, next) {
-    next(null, {
-      name: row.key.split('!').slice(1).join('!'),
-      properties: row.value
+  var self = this
+  var d = duplexify.obj()
+  self.dex.ready(function () {
+    var r = self.metadb.createReadStream({ gt: PROPS, lt: PROPS + '~' })
+    var stream = through.obj(function (row, enc, next) {
+      next(null, {
+        name: row.key.split('!').slice(1).join('!'),
+        properties: row.value
+      })
     })
-  }))
-  return readonly(stream)
+    r.pipe(stream)
+    r.on('error', d.emit.bind(d, 'error'))
+    d.setReadable(stream)
+  })
+  return d
 }
 
 JDEX.prototype.get = function (name, cb) {
-  this.metadb.get(PROPS + name, cb)
+  var self = this
+  self.dex.ready(function () {
+    self.metadb.get(PROPS + name, cb)
+  })
 }
 
 function get (obj, keys) {
