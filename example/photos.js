@@ -34,10 +34,4 @@ if (process.argv[2] === 'add') {
   photos.list().pipe(to.obj(function (img, enc, next) {
     console.log(img)
   }))
-} else if (process.argv[2] === 'get') {
-  var file = process.argv[3]
-  photos.get(file, function (err, info) {
-    if (err) console.error(err)
-    else console.log(info)
-  })
 }
