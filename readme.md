@@ -1,7 +1,6 @@
 # hyperdrive-jpeg-index
 
-index jpeg metadata (such as SOF, EXIF fields)
-and create thumbnails for a [hyperdrive][1] archive
+index jpeg metadata and thumbnails for a [hyperdrive][1] archive
 
 # example
 

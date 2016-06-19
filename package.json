@@ -1,7 +1,7 @@
 {
   "name": "hyperdrive-jpeg-index",
   "version": "1.0.0",
-  "description": "# example",
+  "description": "index jpeg metadata and thumbnails for a hyperdrive archive",
   "main": "index.js",
   "scripts": {
     "test": "tape test/*.js"
