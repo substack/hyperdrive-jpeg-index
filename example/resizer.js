@@ -1,3 +1,6 @@
+// run this script with electron-spawn:
+// $ electron-spawn resizer.js add cactus.jpg
+
 var hyperdrive = require('hyperdrive')
 var fs = require('fs')
 var path = require('path')
