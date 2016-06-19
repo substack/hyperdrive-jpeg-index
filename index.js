@@ -4,6 +4,7 @@ var sub = require('subleveldown')
 var to = require('to2')
 var through = require('through2')
 var duplexify = require('duplexify')
+var once = require('once')
 
 var DEX = 'd', META = 'm', PROPS = 'p!'
 
@@ -28,9 +29,17 @@ function JDEX (opts) {
     db: sub(opts.db, DEX),
     map: function (entry, cb) {
       if (!/\.jpe?g$/i.test(entry.name)) return cb()
+      cb = once(cb)
       var stream = self.archive.createFileReadStream(entry)
       stream.pipe(jpeg()).pipe(to.obj(write, end))
       stream.once('error', cb)
+
+      var pending = 1
+      if (opts.map) {
+        pending++
+        opts.map(entry, stream, done)
+      }
+
       var value = {}
 
       function write (marker, enc, next) {
@@ -42,7 +51,11 @@ function JDEX (opts) {
         next()
       }
       function end () {
-        self.metadb.put(PROPS + entry.name, value, cb)
+        self.metadb.put(PROPS + entry.name, value, done)
+      }
+      function done (err) {
+        if (err) cb(err)
+        else if (--pending === 0) cb()
       }
     }
   })
