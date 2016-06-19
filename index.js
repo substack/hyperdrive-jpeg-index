@@ -59,6 +59,10 @@ JDEX.prototype.list = function (cb) {
   return readonly(stream)
 }
 
+JDEX.prototype.get = function (name, cb) {
+  this.metadb.get(PROPS + name, cb)
+}
+
 function get (obj, keys) {
   var node = obj
   for (var i = 0; i < keys.length; i++) {
