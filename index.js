@@ -48,7 +48,7 @@ function JDEX (opts) {
   })
 }
 
-JDEX.prototype.list = function (cb) {
+JDEX.prototype.list = function () {
   var self = this
   var d = duplexify.obj()
   self.dex.ready(function () {
