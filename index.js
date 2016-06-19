@@ -37,7 +37,11 @@ function JDEX (opts) {
       var pending = 1
       if (opts.map) {
         pending++
-        opts.map(entry, stream, done)
+        opts.map(entry, stream, function (err, props) {
+          if (err) return done(err)
+          if (props) merge(value, props)
+          done()
+        })
       }
 
       var value = {}
@@ -96,4 +100,12 @@ function get (obj, keys) {
     } else node = node[key]
   }
   return node
+}
+
+function merge (a, b) {
+  var keys = Object.keys(b || {})
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i]
+    a[key] = b[key]
+  }
 }
