@@ -18,12 +18,13 @@ var photos = jpeg({
   archive: archive,
   db: sub(db, 'jpeg'),
   properties: {
-    time: ['EXIF','exif','DateTimeOriginal'],
+    time: ['EXIF','exif','DateTimeOriginal',isoString],
     orientation: ['EXIF','image','Orientation'],
     width: ['SOF','width'],
     height: ['SOF','height']
   }
 })
+function isoString (date) { return date.toISOString() }
 
 if (process.argv[2] === 'add') {
   var file = process.argv[3]

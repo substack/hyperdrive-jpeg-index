@@ -12,6 +12,15 @@ function JDEX (opts) {
   if (!(self instanceof JDEX)) return new JDEX(opts)
   self.metadb = sub(opts.db, META)
   self.archive = opts.archive
+
+  var propmap = {}
+  Object.keys(opts.properties || {}).forEach(function (key) {
+    var p = opts.properties[key]
+    var type = p[0]
+    if (!propmap[type]) propmap[type] = []
+    propmap[type].push([key,p.slice(1)])
+  })
+
   self.dex = hdex({
     archive: self.archive,
     db: sub(opts.db, DEX),
@@ -22,10 +31,11 @@ function JDEX (opts) {
       stream.once('error', next)
 
       function write (marker, enc, next) {
-        if (marker.type === 'EXIF') {
-          //console.log('marker=', marker)
-        }
-        console.log(marker)
+        var props = propmap[marker.type] || []
+        props.forEach(function (p) {
+          var n = get(marker, p[1])
+          console.log(p[0], '=>', n)
+        })
         next()
       }
       function end () {}
@@ -33,5 +43,14 @@ function JDEX (opts) {
   })
 }
 
-JDEX.prototype.put = function (x) {
+function get (obj, keys) {
+  var node = obj
+  for (var i = 0; i < keys.length; i++) {
+    if (!node) break
+    var key = keys[i]
+    if (typeof key === 'function') {
+      node = key(node)
+    } else node = node[key]
+  }
+  return node
 }
