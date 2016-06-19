@@ -73,11 +73,17 @@ Create a `photos` instance from:
 * `opts.archive` - a [hyperdrive][1] archive
 * `opts.db` - a leveldb instance to save index data
 * `opts.properties` - map of property keys to marker key paths
+* `opts.map(entry, stream, next)` - intercept the entry and binary jpeg stream
 
 Each marker key path given in `opts.properties` is an array that describes the
 nested location into a [marker object][2] to produce a value. Key path items can
 be a string or a `function (node) {}` that take an object as input and should
 return the next node value to use in the traversal.
+
+With `opts.map` you can calculate secondary indexes or set additional
+properties. Call `next(err, props)` with any additional properties to set on the
+record. You can use `opts.map` to do things like generate resized versions of
+the image to store elsewhere.
 
 ## var stream = photos.list()
 
